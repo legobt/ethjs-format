@@ -2158,6 +2158,23 @@ module.exports = {
 			[],
 			"B"
 		],
+		"personal_sign": [
+			[
+				"D20",
+				"D",
+				"S"
+			],
+			"D",
+			2
+		],
+		"personal_ecRecover": [
+			[
+				"D",
+				"D"
+			],
+			"D20",
+			2
+		],
 		"eth_protocolVersion": [
 			[],
 			"S"
@@ -2741,8 +2758,6 @@ module.exports = {
 
 var BN = __webpack_require__(8);
 var stripHexPrefix = __webpack_require__(0);
-
-console.log(new BN('87234987239872349872489724897248972348972389472498728723897234', 16).toString(10));
 
 /**
  * Returns a BN object, converts a number value to a BN

@@ -1,3 +1,5 @@
+# 0.1.8 -- added personal sign and recover
+
 # 0.1.7 -- hex prefix
 
 1. Updates number-to-bn
