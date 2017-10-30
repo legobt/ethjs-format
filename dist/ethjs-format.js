@@ -2160,8 +2160,8 @@ module.exports = {
 		],
 		"personal_sign": [
 			[
-				"D20",
 				"D",
+				"D20",
 				"S"
 			],
 			"D",
@@ -2181,7 +2181,7 @@ module.exports = {
 		],
 		"eth_syncing": [
 			[],
-			"Boolean|EthSyncing"
+			"B|EthSyncing"
 		],
 		"eth_coinbase": [
 			[],
@@ -2281,6 +2281,11 @@ module.exports = {
 			],
 			"D",
 			2
+		],
+		"eth_signTypedData": [
+			"D32",
+			"D",
+			1
 		],
 		"eth_sendTransaction": [
 			[
@@ -2677,7 +2682,7 @@ module.exports = {
 			"__required": [],
 			"fromBlock": "Q|T",
 			"toBlock": "Q|T",
-			"address": "Array|Data",
+			"address": "D20",
 			"topics": [
 				"D"
 			]
