@@ -2283,7 +2283,10 @@ module.exports = {
 			2
 		],
 		"eth_signTypedData": [
-			"D32",
+			[
+				"Array|DATA",
+				"D20"
+			],
 			"D",
 			1
 		],
