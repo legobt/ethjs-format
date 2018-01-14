@@ -2277,7 +2277,7 @@ module.exports = {
 		"eth_sign": [
 			[
 				"D20",
-				"D32"
+				"D"
 			],
 			"D",
 			2
