@@ -1,26 +1,10 @@
 ## ethjs-format
 
 <div>
-  <!-- Dependency Status -->
-  <a href="https://david-dm.org/ethjs/ethjs-format">
-    <img src="https://david-dm.org/ethjs/ethjs-format.svg"
-    alt="Dependency Status" />
-  </a>
-
-  <!-- devDependency Status -->
-  <a href="https://david-dm.org/ethjs/ethjs-format#info=devDependencies">
-    <img src="https://david-dm.org/ethjs/ethjs-format/dev-status.svg" alt="devDependency Status" />
-  </a>
-
   <!-- NPM Version -->
-  <a href="https://www.npmjs.org/package/ethjs-format">
-    <img src="http://img.shields.io/npm/v/ethjs-format.svg"
+  <a href="https://www.npmjs.org/package/@metamask/ethjs-format">
+    <img src="http://img.shields.io/npm/v/@metamask/ethjs-format.svg"
     alt="NPM version" />
-  </a>
-
-  <!-- Javascript Style -->
-  <a href="http://airbnb.io/javascript/">
-    <img src="https://img.shields.io/badge/code%20style-airbnb-brightgreen.svg" alt="js-airbnb-style" />
   </a>
 </div>
 
@@ -31,13 +15,13 @@ A payload formatter for the Ethereum RPC layer.
 ## Install
 
 ```
-npm install --save ethjs-format
+npm install --save @metamask/ethjs-format
 ```
 
 ## Usage
 
 ```js
-const format = require('ethjs-format');
+const format = require('@metamask/ethjs-format');
 
 const inputPayload = format.formatInputs('eth_getBalance', ["0x407d73d8a49eeb85d32cf465507dd71d507100c1", 405938494]);
 
@@ -145,13 +129,13 @@ There is always a lot of work to do, and will have many rules to maintain. So pl
 
 Please consult our [Code of Conduct](CODE_OF_CONDUCT.md) docs before helping out.
 
-We communicate via [issues](https://github.com/ethjs/ethjs-format/issues) and [pull requests](https://github.com/ethjs/ethjs-format/pulls).
+We communicate via [issues](https://github.com/MetaMask/ethjs-format/issues) and [pull requests](https://github.com/MetaMask/ethjs-format/pulls).
 
 ## Important documents
 
 - [Changelog](CHANGELOG.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
-- [License](https://raw.githubusercontent.com/ethjs/ethjs-format/master/LICENSE)
+- [License](https://raw.githubusercontent.com/MetaMask/ethjs-format/master/LICENSE)
 
 ## Licence
 

@@ -11,7 +11,7 @@ npm install --save ethjs-format
 ## Install from Source
 
 ```
-git clone http://github.com/ethjs/ethjs-format
+git clone http://github.com/MetaMask/ethjs-format
 npm install
 ```
 

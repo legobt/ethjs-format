@@ -5,13 +5,13 @@ All information for developers using `ethjs-format` should consult this document
 ## Install
 
 ```
-npm install --save ethjs-format
+npm install --save @metamask/ethjs-format
 ```
 
 ## Usage
 
 ```js
-const format = require('ethjs-format');
+const format = require('@metamask/ethjs-format');
 
 const inputPayload = format.formatInputs('eth_sendTransaction', [{
   "from": "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
@@ -56,7 +56,7 @@ const outputPayload = format.formatOutputs('eth_sendTransaction', "0xe670ec64341
   Will encode complex RPC objects like the `eth_sendTransaction` input object structure `{from: ..., data: ..., gas: ...}` for RPC payloads. For complex objects, it also enforces by `throw` required fields such as `from` and `data` for the `eth_sendTransaction` input object.
 
   ```js
-  const format = require('ethjs-format');
+  const format = require('@metamask/ethjs-format');
 
   const inputPayload = format.formatInputs('eth_sendTransaction', [{
     "from": "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
@@ -183,28 +183,6 @@ Note, even though `ethjs` should have transformed and polyfilled most of the req
 
 Use a polyfill service such as `Polyfill.io` to ensure complete cross-browser support:
 https://polyfill.io/
-
-## Latest Webpack Figures
-
-```
-Hash: bff3839e979e26b98b3e                                                           
-Version: webpack 2.1.0-beta.15
-Time: 842ms
-              Asset    Size  Chunks             Chunk Names
-    ethjs-format.js  170 kB       0  [emitted]  main
-ethjs-format.js.map  213 kB       0  [emitted]  main
-    + 13 hidden modules
-
-> ethjs-format@0.1.3 build:umd:min /home/nick/github/ethjs-format
-> cross-env BABEL_ENV=commonjs NODE_ENV=production webpack --config ./internals/webpack/webpack.config.js ./lib/index.js --progress
-
-Hash: 6530438ecf2a47b0ed05                                                           
-Version: webpack 2.1.0-beta.15
-Time: 2755ms
-              Asset     Size  Chunks             Chunk Names
-ethjs-format.min.js  75.4 kB       0  [emitted]  main
-    + 13 hidden modules
-```
 
 ## Other Awesome Modules, Tools and Frameworks
 
