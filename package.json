@@ -187,7 +187,7 @@
   "pre-commit": "build",
   "repository": {
     "type": "git",
-    "url": "https://git@github.com/MetaMask/ethjs-format.git"
+    "url": "https://github.com/MetaMask/ethjs-format"
   },
   "scripts": {
     "build": "npm run build:commonjs && npm run test:lib && npm run build:umd && npm run build:umd:min",
