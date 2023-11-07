@@ -71,7 +71,7 @@
   "bugs": {
     "url": "https://github.com/MetaMask/ethjs-format/issues"
   },
-  "bundleDependencies": false,
+  "bundleDependencies": [],
   "dependencies": {
     "bn.js": "4.11.6",
     "ethjs-schema": "0.2.1",
