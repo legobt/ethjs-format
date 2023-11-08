@@ -1918,12 +1918,10 @@ module.exports = function isHexPrefixed(str) {
 
 
 var schema = __webpack_require__(4);
-
 var _require = __webpack_require__(5),
-    arrayContainsArray = _require.arrayContainsArray,
-    getBinarySize = _require.getBinarySize,
-    padToEven = _require.padToEven;
-
+  arrayContainsArray = _require.arrayContainsArray,
+  getBinarySize = _require.getBinarySize,
+  padToEven = _require.padToEven;
 var numberToBN = __webpack_require__(10);
 var stripHexPrefix = __webpack_require__(0);
 
@@ -1941,15 +1939,12 @@ function formatQuantity(value, encode, pad) {
   if (['string', 'number', 'object'].indexOf(typeof value) === -1 || value === null) {
     return value;
   }
-
   var numberValue = numberToBN(value);
   var numPadding = pad && numberValue.toString(16).length % 2 ? '0' : '';
-
   if (numberToBN(value).isNeg()) {
-    throw new Error('[ethjs-format] while formatting quantity \'' + numberValue.toString(10) + '\', invalid negative number. Number must be positive or zero.');
+    throw new Error("[ethjs-format] while formatting quantity '" + numberValue.toString(10) + "', invalid negative number. Number must be positive or zero.");
   }
-
-  return encode ? '0x' + numPadding + numberValue.toString(16) : numberValue;
+  return encode ? "0x" + numPadding + numberValue.toString(16) : numberValue;
 }
 
 /**
@@ -1969,7 +1964,6 @@ function formatQuantityOrTag(value, encode) {
   if (schema.tags.indexOf(value) === -1) {
     output = formatQuantity(value, encode);
   }
-
   return output;
 }
 
@@ -1988,7 +1982,7 @@ function formatData(value, byteLength) {
 
   // prefix only under strict conditions, else bypass
   if (typeof value === 'string') {
-    output = '0x' + padToEven(stripHexPrefix(value));
+    output = "0x" + padToEven(stripHexPrefix(value));
     outputByteLength = getBinarySize(output);
   }
 
@@ -2000,9 +1994,8 @@ function formatData(value, byteLength) {
   // throw if bytelength is not correct
   if (typeof byteLength === 'number' && value !== null && output !== '0x' && output !== '0x0' // support empty values
   && (!/^[0-9A-Fa-f]+$/.test(stripHexPrefix(output)) || outputByteLength !== 2 + byteLength * 2)) {
-    throw new Error('[ethjs-format] hex string \'' + output + '\' must be an alphanumeric ' + (2 + byteLength * 2) + ' utf8 byte hex (chars: a-fA-F) string, is ' + outputByteLength + ' bytes');
+    throw new Error("[ethjs-format] hex string '" + output + "' must be an alphanumeric " + (2 + byteLength * 2) + " utf8 byte hex (chars: a-fA-F) string, is " + outputByteLength + " bytes");
   }
-
   return output;
 }
 
@@ -2034,7 +2027,7 @@ function formatObject(formatter, value, encode) {
   // check if all required data keys are fulfilled
   if (!arrayContainsArray(Object.keys(value), formatObject.__required)) {
     // eslint-disable-line
-    throw new Error('[ethjs-format] object ' + JSON.stringify(value) + ' must contain properties: ' + formatObject.__required.join(', ')); // eslint-disable-line
+    throw new Error("[ethjs-format] object " + JSON.stringify(value) + " must contain properties: " + formatObject.__required.join(', ')); // eslint-disable-line
   }
 
   // assume formatObject is an object, go through keys and format each
@@ -2043,7 +2036,6 @@ function formatObject(formatter, value, encode) {
       output[valueKey] = format(formatObject[valueKey], value[valueKey], encode);
     }
   });
-
   return output;
 }
 
@@ -2075,7 +2067,7 @@ function formatArray(formatter, value, encode, lengthRequirement) {
 
   // enforce minimum value length requirements
   if (encode === true && typeof lengthRequirement === 'number' && value.length < lengthRequirement) {
-    throw new Error('array ' + JSON.stringify(value) + ' must contain at least ' + lengthRequirement + ' params, but only contains ' + value.length + '.'); // eslint-disable-line
+    throw new Error("array " + JSON.stringify(value) + " must contain at least " + lengthRequirement + " params, but only contains " + value.length + "."); // eslint-disable-line
   }
 
   // make new array, avoid mutation
@@ -2090,10 +2082,8 @@ function formatArray(formatter, value, encode, lengthRequirement) {
     if (formatObject.length > 1) {
       formatObjectKey = valueIndex;
     }
-
     output[valueIndex] = format(formatObject[formatObjectKey], valueKey, encode);
   });
-
   return output;
 }
 
@@ -2130,7 +2120,6 @@ function format(formatter, value, encode, lengthRequirement) {
   } else if (Array.isArray(value)) {
     output = formatArray(formatter, value, encode, lengthRequirement);
   }
-
   return output;
 }
 
