@@ -1,10 +1,7 @@
 const schema = require('ethjs-schema');
-const util = require('ethjs-util');
+const { arrayContainsArray, getBinarySize, padToEven } = require('ethjs-util');
 const numberToBN = require('number-to-bn');
 const stripHexPrefix = require('strip-hex-prefix');
-const padToEven = util.padToEven;
-const arrayContainsArray = util.arrayContainsArray;
-const getBinarySize = util.getBinarySize;
 
 /**
  * Format quantity values, either encode to hex or decode to BigNumber
@@ -199,15 +196,13 @@ function format(formatter, value, encode, lengthRequirement) {
     output = formatData(value, 20); // dont format data flagged objects like compiler output
   } else if (formatter === 'D32') {
     output = formatData(value, 32); // dont format data flagged objects like compiler output
-  } else {
+  } else if (typeof value === 'object'
     // if value is an object or array
-    if (typeof value === 'object'
-      && value !== null
-      && Array.isArray(value) === false) {
-      output = formatObject(formatter, value, encode);
-    } else if (Array.isArray(value)) {
-      output = formatArray(formatter, value, encode, lengthRequirement);
-    }
+    && value !== null
+    && Array.isArray(value) === false) {
+    output = formatObject(formatter, value, encode);
+  } else if (Array.isArray(value)) {
+    output = formatArray(formatter, value, encode, lengthRequirement);
   }
 
   return output;

@@ -1,4 +1,4 @@
- /* eslint-disable */ 
+/* eslint-disable */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -8,7 +8,7 @@
 		exports["ethFormat"] = factory();
 	else
 		root["ethFormat"] = factory();
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -17,9 +17,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -44,16 +44,24 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmory imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
-/******/ 	// define getter function for harmory exports
+/******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		Object.defineProperty(exports, name, {
-/******/ 			configurable: false,
-/******/ 			enumerable: true,
-/******/ 			get: getter
-/******/ 		});
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
 /******/ 	};
 /******/
 /******/ 	// Object.prototype.hasOwnProperty.call
@@ -63,12 +71,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 var isHexPrefixed = __webpack_require__(2);
 
@@ -86,24 +94,24 @@ module.exports = function stripHexPrefix(str) {
 }
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer, global) {/*!
+/* WEBPACK VAR INJECTION */(function(global) {/*!
  * The buffer module from node.js, for the browser.
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <http://feross.org>
  * @license  MIT
  */
 /* eslint-disable no-proto */
 
-'use strict'
+
 
 var base64 = __webpack_require__(7)
-var ieee754 = __webpack_require__(9)
-var isArray = __webpack_require__(10)
+var ieee754 = __webpack_require__(8)
+var isArray = __webpack_require__(9)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -1881,11 +1889,11 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1).Buffer, __webpack_require__(11)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 /**
  * Returns a `Boolean` on whether or not the a `String` starts with '0x'
@@ -1902,12 +1910,268 @@ module.exports = function isHexPrefixed(str) {
 }
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
+
+
+var schema = __webpack_require__(4);
+var _require = __webpack_require__(5),
+  arrayContainsArray = _require.arrayContainsArray,
+  getBinarySize = _require.getBinarySize,
+  padToEven = _require.padToEven;
+var numberToBN = __webpack_require__(10);
+var stripHexPrefix = __webpack_require__(0);
+
+/**
+ * Format quantity values, either encode to hex or decode to BigNumber
+ * should intake null, stringNumber, number, BN
+ *
+ * @method formatQuantity
+ * @param {String|BigNumber|Number} value quantity or tag to convert
+ * @param {Boolean} encode to hex or decode to BigNumber
+ * @returns {Optional} output to BigNumber or string
+ * @throws error if value is a float
+ */
+function formatQuantity(value, encode, pad) {
+  if (['string', 'number', 'object'].indexOf(typeof value) === -1 || value === null) {
+    return value;
+  }
+  var numberValue = numberToBN(value);
+  var numPadding = pad && numberValue.toString(16).length % 2 ? '0' : '';
+  if (numberToBN(value).isNeg()) {
+    throw new Error("[ethjs-format] while formatting quantity '" + numberValue.toString(10) + "', invalid negative number. Number must be positive or zero.");
+  }
+  return encode ? "0x" + numPadding + numberValue.toString(16) : numberValue;
+}
+
+/**
+ * Format quantity or tag, if tag bypass return, else format quantity
+ * should intake null, stringNumber, number, BN, string tag
+ *
+ * @method formatQuantityOrTag
+ * @param {String|BigNumber|Number} value quantity or tag to convert
+ * @param {Boolean} encode encode the number to hex or decode to BigNumber
+ * @returns {Object|String} output to BigNumber or string
+ * @throws error if value is a float
+ */
+function formatQuantityOrTag(value, encode) {
+  var output = value; // eslint-disable-line
+
+  // if the value is a tag, bypass
+  if (schema.tags.indexOf(value) === -1) {
+    output = formatQuantity(value, encode);
+  }
+  return output;
+}
+
+/**
+ * FormatData under strict conditions hex prefix
+ *
+ * @method formatData
+ * @param {String} value the bytes data to be formatted
+ * @param {Number} byteLength the required byte length (usually 20 or 32)
+ * @returns {String} output output formatted data
+ * @throws error if minimum length isnt met
+ */
+function formatData(value, byteLength) {
+  var output = value; // eslint-disable-line
+  var outputByteLength = 0; // eslint-disable-line
+
+  // prefix only under strict conditions, else bypass
+  if (typeof value === 'string') {
+    output = "0x" + padToEven(stripHexPrefix(value));
+    outputByteLength = getBinarySize(output);
+  }
+
+  // format double padded zeros.
+  if (output === '0x00') {
+    output = '0x0';
+  }
+
+  // throw if bytelength is not correct
+  if (typeof byteLength === 'number' && value !== null && output !== '0x' && output !== '0x0' // support empty values
+  && (!/^[0-9A-Fa-f]+$/.test(stripHexPrefix(output)) || outputByteLength !== 2 + byteLength * 2)) {
+    throw new Error("[ethjs-format] hex string '" + output + "' must be an alphanumeric " + (2 + byteLength * 2) + " utf8 byte hex (chars: a-fA-F) string, is " + outputByteLength + " bytes");
+  }
+  return output;
+}
+
+/**
+ * Format object, even with random RPC caviets
+ *
+ * @method formatObject
+ * @param {String|Array} formatter the unit to convert to, default ether
+ * @param {Object} value the object value
+ * @param {Boolean} encode encode to hex or decode to BigNumber
+ * @returns {Object} output object
+ * @throws error if value is a float
+ */
+function formatObject(formatter, value, encode) {
+  var output = Object.assign({}, value); // eslint-disable-line
+  var formatObject = null; // eslint-disable-line
+
+  // if the object is a string flag, then retreive the object
+  if (typeof formatter === 'string') {
+    if (formatter === 'Boolean|EthSyncing') {
+      formatObject = Object.assign({}, schema.objects.EthSyncing);
+    } else if (formatter === 'DATA|Transaction') {
+      formatObject = Object.assign({}, schema.objects.Transaction);
+    } else {
+      formatObject = Object.assign({}, schema.objects[formatter]);
+    }
+  }
+
+  // check if all required data keys are fulfilled
+  if (!arrayContainsArray(Object.keys(value), formatObject.__required)) {
+    // eslint-disable-line
+    throw new Error("[ethjs-format] object " + JSON.stringify(value) + " must contain properties: " + formatObject.__required.join(', ')); // eslint-disable-line
+  }
+
+  // assume formatObject is an object, go through keys and format each
+  Object.keys(formatObject).forEach(function (valueKey) {
+    if (valueKey !== '__required' && typeof value[valueKey] !== 'undefined') {
+      output[valueKey] = format(formatObject[valueKey], value[valueKey], encode);
+    }
+  });
+  return output;
+}
+
+/**
+ * Format array
+ *
+ * @method formatArray
+ * @param {String|Array} formatter the unit to convert to, default ether
+ * @param {Object} value the value in question
+ * @param {Boolean} encode encode to hex or decode to BigNumber
+ * @param {Number} lengthRequirement the required minimum array length
+ * @returns {Object} output object
+ * @throws error if minimum length isnt met
+ */
+function formatArray(formatter, value, encode, lengthRequirement) {
+  var output = value.slice(); // eslint-disable-line
+  var formatObject = formatter; // eslint-disable-line
+
+  // if the formatter is an array or data, then make format object an array data
+  if (formatter === 'Array|DATA') {
+    formatObject = ['D'];
+  }
+
+  // if formatter is a FilterChange and acts like a BlockFilter
+  // or PendingTx change format object to tx hash array
+  if (formatter === 'FilterChange' && typeof value[0] === 'string') {
+    formatObject = ['D32'];
+  }
+
+  // enforce minimum value length requirements
+  if (encode === true && typeof lengthRequirement === 'number' && value.length < lengthRequirement) {
+    throw new Error("array " + JSON.stringify(value) + " must contain at least " + lengthRequirement + " params, but only contains " + value.length + "."); // eslint-disable-line
+  }
+
+  // make new array, avoid mutation
+  formatObject = formatObject.slice();
+
+  // assume formatObject is an object, go through keys and format each
+  value.forEach(function (valueKey, valueIndex) {
+    // use key zero as formatter for all values, unless otherwise specified
+    var formatObjectKey = 0; // eslint-disable-line
+
+    // if format array is exact, check each argument against formatter argument
+    if (formatObject.length > 1) {
+      formatObjectKey = valueIndex;
+    }
+    output[valueIndex] = format(formatObject[formatObjectKey], valueKey, encode);
+  });
+  return output;
+}
+
+/**
+ * Format various kinds of data to RPC spec or into digestable JS objects
+ *
+ * @method format
+ * @param {String|Array} formatter the data formatter
+ * @param {String|Array|Object|Null|Number} value the data value input
+ * @param {Boolean} encode encode to hex or decode to BigNumbers, Strings, Booleans, Null
+ * @param {Number} lengthRequirement the minimum data length requirement
+ * @throws error if minimum length isnt met
+ */
+function format(formatter, value, encode, lengthRequirement) {
+  var output = value; // eslint-disable-line
+
+  // if formatter is quantity or quantity or tag
+  if (formatter === 'Q') {
+    output = formatQuantity(value, encode);
+  } else if (formatter === 'QP') {
+    output = formatQuantity(value, encode, true);
+  } else if (formatter === 'Q|T') {
+    output = formatQuantityOrTag(value, encode);
+  } else if (formatter === 'D') {
+    output = formatData(value); // dont format data flagged objects like compiler output
+  } else if (formatter === 'D20') {
+    output = formatData(value, 20); // dont format data flagged objects like compiler output
+  } else if (formatter === 'D32') {
+    output = formatData(value, 32); // dont format data flagged objects like compiler output
+  } else if (typeof value === 'object'
+  // if value is an object or array
+  && value !== null && Array.isArray(value) === false) {
+    output = formatObject(formatter, value, encode);
+  } else if (Array.isArray(value)) {
+    output = formatArray(formatter, value, encode, lengthRequirement);
+  }
+  return output;
+}
+
+/**
+ * Format RPC inputs generally to the node or TestRPC
+ *
+ * @method formatInputs
+ * @param {Object} method the data formatter
+ * @param {Array} inputs the data inputs
+ * @returns {Array} output the formatted inputs array
+ * @throws error if minimum length isnt met
+ */
+function formatInputs(method, inputs) {
+  return format(schema.methods[method][0], inputs, true, schema.methods[method][2]);
+}
+
+/**
+ * Format RPC outputs generally from the node or TestRPC
+ *
+ * @method formatOutputs
+ * @param {Object} method the data formatter
+ * @param {Array|String|Null|Boolean|Object} outputs the data inputs
+ * @returns {Array|String|Null|Boolean|Object} output the formatted data
+ */
+function formatOutputs(method, outputs) {
+  return format(schema.methods[method][1], outputs, false);
+}
+
+// export formatters
+module.exports = {
+  schema: schema,
+  formatQuantity: formatQuantity,
+  formatQuantityOrTag: formatQuantityOrTag,
+  formatObject: formatObject,
+  formatArray: formatArray,
+  format: format,
+  formatInputs: formatInputs,
+  formatOutputs: formatOutputs
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = {"methods":{"web3_clientVersion":[[],"S"],"web3_sha3":[["S"],"D",1],"net_version":[[],"S"],"net_peerCount":[[],"Q"],"net_listening":[[],"B"],"personal_sign":[["D","D20","S"],"D",2],"personal_ecRecover":[["D","D"],"D20",2],"eth_protocolVersion":[[],"S"],"eth_syncing":[[],"B|EthSyncing"],"eth_coinbase":[[],"D20"],"eth_mining":[[],"B"],"eth_hashrate":[[],"Q"],"eth_gasPrice":[[],"Q"],"eth_accounts":[[],["D20"]],"eth_blockNumber":[[],"Q"],"eth_getBalance":[["D20","Q|T"],"Q",1,2],"eth_getStorageAt":[["D20","Q","Q|T"],"D",2,2],"eth_getTransactionCount":[["D20","Q|T"],"Q",1,2],"eth_getBlockTransactionCountByHash":[["D32"],"Q",1],"eth_getBlockTransactionCountByNumber":[["Q|T"],"Q",1],"eth_getUncleCountByBlockHash":[["D32"],"Q",1],"eth_getUncleCountByBlockNumber":[["Q"],"Q",1],"eth_getCode":[["D20","Q|T"],"D",1,2],"eth_sign":[["D20","D"],"D",2],"eth_signTypedData":[["Array|DATA","D20"],"D",1],"eth_sendTransaction":[["SendTransaction"],"D",1],"eth_sendRawTransaction":[["D"],"D32",1],"eth_call":[["CallTransaction","Q|T"],"D",1,2],"eth_estimateGas":[["EstimateTransaction","Q|T"],"Q",1],"eth_getBlockByHash":[["D32","B"],"Block",2],"eth_getBlockByNumber":[["Q|T","B"],"Block",2],"eth_getTransactionByHash":[["D32"],"Transaction",1],"eth_getTransactionByBlockHashAndIndex":[["D32","Q"],"Transaction",2],"eth_getTransactionByBlockNumberAndIndex":[["Q|T","Q"],"Transaction",2],"eth_getTransactionReceipt":[["D32"],"Receipt",1],"eth_getUncleByBlockHashAndIndex":[["D32","Q"],"Block",1],"eth_getUncleByBlockNumberAndIndex":[["Q|T","Q"],"Block",2],"eth_getCompilers":[[],["S"]],"eth_compileLLL":[["S"],"D",1],"eth_compileSolidity":[["S"],"D",1],"eth_compileSerpent":[["S"],"D",1],"eth_newFilter":[["Filter"],"Q",1],"eth_newBlockFilter":[[],"Q"],"eth_newPendingTransactionFilter":[[],"Q"],"eth_uninstallFilter":[["QP"],"B",1],"eth_getFilterChanges":[["QP"],["FilterChange"],1],"eth_getFilterLogs":[["QP"],["FilterChange"],1],"eth_getLogs":[["Filter"],["FilterChange"],1],"eth_getWork":[[],["D"]],"eth_submitWork":[["D","D32","D32"],"B",3],"eth_submitHashrate":[["D","D"],"B",2],"db_putString":[["S","S","S"],"B",2],"db_getString":[["S","S"],"S",2],"db_putHex":[["S","S","D"],"B",2],"db_getHex":[["S","S"],"D",2],"shh_post":[["SHHPost"],"B",1],"shh_version":[[],"S"],"shh_newIdentity":[[],"D"],"shh_hasIdentity":[["D"],"B"],"shh_newGroup":[[],"D"],"shh_addToGroup":[["D"],"B",1],"shh_newFilter":[["SHHFilter"],"Q",1],"shh_uninstallFilter":[["Q"],"B",1],"shh_getFilterChanges":[["Q"],["SHHFilterChange"],1],"shh_getMessages":[["Q"],["SHHFilterChange"],1]},"tags":["latest","earliest","pending"],"objects":{"EthSyncing":{"__required":[],"startingBlock":"Q","currentBlock":"Q","highestBlock":"Q"},"SendTransaction":{"__required":["from","data"],"from":"D20","to":"D20","gas":"Q","gasPrice":"Q","value":"Q","data":"D","nonce":"Q"},"EstimateTransaction":{"__required":[],"from":"D20","to":"D20","gas":"Q","gasPrice":"Q","value":"Q","data":"D","nonce":"Q"},"CallTransaction":{"__required":["to"],"from":"D20","to":"D20","gas":"Q","gasPrice":"Q","value":"Q","data":"D","nonce":"Q"},"Block":{"__required":[],"number":"Q","hash":"D32","parentHash":"D32","nonce":"D","sha3Uncles":"D","logsBloom":"D","transactionsRoot":"D","stateRoot":"D","receiptsRoot":"D","miner":"D","difficulty":"Q","totalDifficulty":"Q","extraData":"D","size":"Q","gasLimit":"Q","gasUsed":"Q","timestamp":"Q","transactions":["DATA|Transaction"],"uncles":["D"]},"Transaction":{"__required":[],"hash":"D32","nonce":"Q","blockHash":"D32","blockNumber":"Q","transactionIndex":"Q","from":"D20","to":"D20","value":"Q","gasPrice":"Q","gas":"Q","input":"D"},"Receipt":{"__required":[],"transactionHash":"D32","transactionIndex":"Q","blockHash":"D32","blockNumber":"Q","cumulativeGasUsed":"Q","gasUsed":"Q","contractAddress":"D20","logs":["FilterChange"]},"Filter":{"__required":[],"fromBlock":"Q|T","toBlock":"Q|T","address":"D20","topics":["D"]},"FilterChange":{"__required":[],"removed":"B","logIndex":"Q","transactionIndex":"Q","transactionHash":"D32","blockHash":"D32","blockNumber":"Q","address":"D20","data":"Array|DATA","topics":["D"]},"SHHPost":{"__required":["topics","payload","priority","ttl"],"from":"D","to":"D","topics":["D"],"payload":"D","priority":"Q","ttl":"Q"},"SHHFilter":{"__required":["topics"],"to":"D","topics":["D"]},"SHHFilterChange":{"__required":[],"hash":"D","from":"D","to":"D","expiry":"Q","ttl":"Q","sent":"Q","topics":["D"],"payload":"D","workProved":"Q"},"SHHMessage":{"__required":[],"hash":"D","from":"D","to":"D","expiry":"Q","ttl":"Q","sent":"Q","topics":["D"],"payload":"D","workProved":"Q"}}}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
 
 var isHexPrefixed = __webpack_require__(2);
 var stripHexPrefix = __webpack_require__(0);
@@ -2129,642 +2393,297 @@ module.exports = {
 };
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1).Buffer))
 
-/***/ },
-/* 4 */
-/***/ function(module, exports) {
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
 
-module.exports = {
-	"methods": {
-		"web3_clientVersion": [
-			[],
-			"S"
-		],
-		"web3_sha3": [
-			[
-				"S"
-			],
-			"D",
-			1
-		],
-		"net_version": [
-			[],
-			"S"
-		],
-		"net_peerCount": [
-			[],
-			"Q"
-		],
-		"net_listening": [
-			[],
-			"B"
-		],
-		"personal_sign": [
-			[
-				"D",
-				"D20",
-				"S"
-			],
-			"D",
-			2
-		],
-		"personal_ecRecover": [
-			[
-				"D",
-				"D"
-			],
-			"D20",
-			2
-		],
-		"eth_protocolVersion": [
-			[],
-			"S"
-		],
-		"eth_syncing": [
-			[],
-			"B|EthSyncing"
-		],
-		"eth_coinbase": [
-			[],
-			"D20"
-		],
-		"eth_mining": [
-			[],
-			"B"
-		],
-		"eth_hashrate": [
-			[],
-			"Q"
-		],
-		"eth_gasPrice": [
-			[],
-			"Q"
-		],
-		"eth_accounts": [
-			[],
-			[
-				"D20"
-			]
-		],
-		"eth_blockNumber": [
-			[],
-			"Q"
-		],
-		"eth_getBalance": [
-			[
-				"D20",
-				"Q|T"
-			],
-			"Q",
-			1,
-			2
-		],
-		"eth_getStorageAt": [
-			[
-				"D20",
-				"Q",
-				"Q|T"
-			],
-			"D",
-			2,
-			2
-		],
-		"eth_getTransactionCount": [
-			[
-				"D20",
-				"Q|T"
-			],
-			"Q",
-			1,
-			2
-		],
-		"eth_getBlockTransactionCountByHash": [
-			[
-				"D32"
-			],
-			"Q",
-			1
-		],
-		"eth_getBlockTransactionCountByNumber": [
-			[
-				"Q|T"
-			],
-			"Q",
-			1
-		],
-		"eth_getUncleCountByBlockHash": [
-			[
-				"D32"
-			],
-			"Q",
-			1
-		],
-		"eth_getUncleCountByBlockNumber": [
-			[
-				"Q"
-			],
-			"Q",
-			1
-		],
-		"eth_getCode": [
-			[
-				"D20",
-				"Q|T"
-			],
-			"D",
-			1,
-			2
-		],
-		"eth_sign": [
-			[
-				"D20",
-				"D"
-			],
-			"D",
-			2
-		],
-		"eth_signTypedData": [
-			[
-				"Array|DATA",
-				"D20"
-			],
-			"D",
-			1
-		],
-		"eth_sendTransaction": [
-			[
-				"SendTransaction"
-			],
-			"D",
-			1
-		],
-		"eth_sendRawTransaction": [
-			[
-				"D"
-			],
-			"D32",
-			1
-		],
-		"eth_call": [
-			[
-				"CallTransaction",
-				"Q|T"
-			],
-			"D",
-			1,
-			2
-		],
-		"eth_estimateGas": [
-			[
-				"EstimateTransaction",
-				"Q|T"
-			],
-			"Q",
-			1
-		],
-		"eth_getBlockByHash": [
-			[
-				"D32",
-				"B"
-			],
-			"Block",
-			2
-		],
-		"eth_getBlockByNumber": [
-			[
-				"Q|T",
-				"B"
-			],
-			"Block",
-			2
-		],
-		"eth_getTransactionByHash": [
-			[
-				"D32"
-			],
-			"Transaction",
-			1
-		],
-		"eth_getTransactionByBlockHashAndIndex": [
-			[
-				"D32",
-				"Q"
-			],
-			"Transaction",
-			2
-		],
-		"eth_getTransactionByBlockNumberAndIndex": [
-			[
-				"Q|T",
-				"Q"
-			],
-			"Transaction",
-			2
-		],
-		"eth_getTransactionReceipt": [
-			[
-				"D32"
-			],
-			"Receipt",
-			1
-		],
-		"eth_getUncleByBlockHashAndIndex": [
-			[
-				"D32",
-				"Q"
-			],
-			"Block",
-			1
-		],
-		"eth_getUncleByBlockNumberAndIndex": [
-			[
-				"Q|T",
-				"Q"
-			],
-			"Block",
-			2
-		],
-		"eth_getCompilers": [
-			[],
-			[
-				"S"
-			]
-		],
-		"eth_compileLLL": [
-			[
-				"S"
-			],
-			"D",
-			1
-		],
-		"eth_compileSolidity": [
-			[
-				"S"
-			],
-			"D",
-			1
-		],
-		"eth_compileSerpent": [
-			[
-				"S"
-			],
-			"D",
-			1
-		],
-		"eth_newFilter": [
-			[
-				"Filter"
-			],
-			"Q",
-			1
-		],
-		"eth_newBlockFilter": [
-			[],
-			"Q"
-		],
-		"eth_newPendingTransactionFilter": [
-			[],
-			"Q"
-		],
-		"eth_uninstallFilter": [
-			[
-				"QP"
-			],
-			"B",
-			1
-		],
-		"eth_getFilterChanges": [
-			[
-				"QP"
-			],
-			[
-				"FilterChange"
-			],
-			1
-		],
-		"eth_getFilterLogs": [
-			[
-				"QP"
-			],
-			[
-				"FilterChange"
-			],
-			1
-		],
-		"eth_getLogs": [
-			[
-				"Filter"
-			],
-			[
-				"FilterChange"
-			],
-			1
-		],
-		"eth_getWork": [
-			[],
-			[
-				"D"
-			]
-		],
-		"eth_submitWork": [
-			[
-				"D",
-				"D32",
-				"D32"
-			],
-			"B",
-			3
-		],
-		"eth_submitHashrate": [
-			[
-				"D",
-				"D"
-			],
-			"B",
-			2
-		],
-		"db_putString": [
-			[
-				"S",
-				"S",
-				"S"
-			],
-			"B",
-			2
-		],
-		"db_getString": [
-			[
-				"S",
-				"S"
-			],
-			"S",
-			2
-		],
-		"db_putHex": [
-			[
-				"S",
-				"S",
-				"D"
-			],
-			"B",
-			2
-		],
-		"db_getHex": [
-			[
-				"S",
-				"S"
-			],
-			"D",
-			2
-		],
-		"shh_post": [
-			[
-				"SHHPost"
-			],
-			"B",
-			1
-		],
-		"shh_version": [
-			[],
-			"S"
-		],
-		"shh_newIdentity": [
-			[],
-			"D"
-		],
-		"shh_hasIdentity": [
-			[
-				"D"
-			],
-			"B"
-		],
-		"shh_newGroup": [
-			[],
-			"D"
-		],
-		"shh_addToGroup": [
-			[
-				"D"
-			],
-			"B",
-			1
-		],
-		"shh_newFilter": [
-			[
-				"SHHFilter"
-			],
-			"Q",
-			1
-		],
-		"shh_uninstallFilter": [
-			[
-				"Q"
-			],
-			"B",
-			1
-		],
-		"shh_getFilterChanges": [
-			[
-				"Q"
-			],
-			[
-				"SHHFilterChange"
-			],
-			1
-		],
-		"shh_getMessages": [
-			[
-				"Q"
-			],
-			[
-				"SHHFilterChange"
-			],
-			1
-		]
-	},
-	"tags": [
-		"latest",
-		"earliest",
-		"pending"
-	],
-	"objects": {
-		"EthSyncing": {
-			"__required": [],
-			"startingBlock": "Q",
-			"currentBlock": "Q",
-			"highestBlock": "Q"
-		},
-		"SendTransaction": {
-			"__required": [
-				"from",
-				"data"
-			],
-			"from": "D20",
-			"to": "D20",
-			"gas": "Q",
-			"gasPrice": "Q",
-			"value": "Q",
-			"data": "D",
-			"nonce": "Q"
-		},
-		"EstimateTransaction": {
-			"__required": [],
-			"from": "D20",
-			"to": "D20",
-			"gas": "Q",
-			"gasPrice": "Q",
-			"value": "Q",
-			"data": "D",
-			"nonce": "Q"
-		},
-		"CallTransaction": {
-			"__required": [
-				"to"
-			],
-			"from": "D20",
-			"to": "D20",
-			"gas": "Q",
-			"gasPrice": "Q",
-			"value": "Q",
-			"data": "D",
-			"nonce": "Q"
-		},
-		"Block": {
-			"__required": [],
-			"number": "Q",
-			"hash": "D32",
-			"parentHash": "D32",
-			"nonce": "D",
-			"sha3Uncles": "D",
-			"logsBloom": "D",
-			"transactionsRoot": "D",
-			"stateRoot": "D",
-			"receiptsRoot": "D",
-			"miner": "D",
-			"difficulty": "Q",
-			"totalDifficulty": "Q",
-			"extraData": "D",
-			"size": "Q",
-			"gasLimit": "Q",
-			"gasUsed": "Q",
-			"timestamp": "Q",
-			"transactions": [
-				"DATA|Transaction"
-			],
-			"uncles": [
-				"D"
-			]
-		},
-		"Transaction": {
-			"__required": [],
-			"hash": "D32",
-			"nonce": "Q",
-			"blockHash": "D32",
-			"blockNumber": "Q",
-			"transactionIndex": "Q",
-			"from": "D20",
-			"to": "D20",
-			"value": "Q",
-			"gasPrice": "Q",
-			"gas": "Q",
-			"input": "D"
-		},
-		"Receipt": {
-			"__required": [],
-			"transactionHash": "D32",
-			"transactionIndex": "Q",
-			"blockHash": "D32",
-			"blockNumber": "Q",
-			"cumulativeGasUsed": "Q",
-			"gasUsed": "Q",
-			"contractAddress": "D20",
-			"logs": [
-				"FilterChange"
-			]
-		},
-		"Filter": {
-			"__required": [],
-			"fromBlock": "Q|T",
-			"toBlock": "Q|T",
-			"address": "D20",
-			"topics": [
-				"D"
-			]
-		},
-		"FilterChange": {
-			"__required": [],
-			"removed": "B",
-			"logIndex": "Q",
-			"transactionIndex": "Q",
-			"transactionHash": "D32",
-			"blockHash": "D32",
-			"blockNumber": "Q",
-			"address": "D20",
-			"data": "Array|DATA",
-			"topics": [
-				"D"
-			]
-		},
-		"SHHPost": {
-			"__required": [
-				"topics",
-				"payload",
-				"priority",
-				"ttl"
-			],
-			"from": "D",
-			"to": "D",
-			"topics": [
-				"D"
-			],
-			"payload": "D",
-			"priority": "Q",
-			"ttl": "Q"
-		},
-		"SHHFilter": {
-			"__required": [
-				"topics"
-			],
-			"to": "D",
-			"topics": [
-				"D"
-			]
-		},
-		"SHHFilterChange": {
-			"__required": [],
-			"hash": "D",
-			"from": "D",
-			"to": "D",
-			"expiry": "Q",
-			"ttl": "Q",
-			"sent": "Q",
-			"topics": [
-				"D"
-			],
-			"payload": "D",
-			"workProved": "Q"
-		},
-		"SHHMessage": {
-			"__required": [],
-			"hash": "D",
-			"from": "D",
-			"to": "D",
-			"expiry": "Q",
-			"ttl": "Q",
-			"sent": "Q",
-			"topics": [
-				"D"
-			],
-			"payload": "D",
-			"workProved": "Q"
-		}
-	}
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.byteLength = byteLength
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
+}
+
+// Support decoding URL-safe base64 strings, as Node.js does.
+// See: https://en.wikipedia.org/wiki/Base64#URL_applications
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
+
+function getLens (b64) {
+  var len = b64.length
+
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
+  }
+
+  // Trim off extra bytes after placeholder bytes are found
+  // See: https://github.com/beatgammit/base64-js/issues/42
+  var validLen = b64.indexOf('=')
+  if (validLen === -1) validLen = len
+
+  var placeHoldersLen = validLen === len
+    ? 0
+    : 4 - (validLen % 4)
+
+  return [validLen, placeHoldersLen]
+}
+
+// base64 is 4/3 + up to two characters of the original data
+function byteLength (b64) {
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function _byteLength (b64, validLen, placeHoldersLen) {
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function toByteArray (b64) {
+  var tmp
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+
+  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+
+  var curByte = 0
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  var len = placeHoldersLen > 0
+    ? validLen - 4
+    : validLen
+
+  var i
+  for (i = 0; i < len; i += 4) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 18) |
+      (revLookup[b64.charCodeAt(i + 1)] << 12) |
+      (revLookup[b64.charCodeAt(i + 2)] << 6) |
+      revLookup[b64.charCodeAt(i + 3)]
+    arr[curByte++] = (tmp >> 16) & 0xFF
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 2) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 2) |
+      (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 1) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 10) |
+      (revLookup[b64.charCodeAt(i + 1)] << 4) |
+      (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] +
+    lookup[num >> 12 & 0x3F] +
+    lookup[num >> 6 & 0x3F] +
+    lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp =
+      ((uint8[i] << 16) & 0xFF0000) +
+      ((uint8[i + 1] << 8) & 0xFF00) +
+      (uint8[i + 2] & 0xFF)
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] +
+      '=='
+    )
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 10] +
+      lookup[(tmp >> 4) & 0x3F] +
+      lookup[(tmp << 2) & 0x3F] +
+      '='
+    )
+  }
+
+  return parts.join('')
+}
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = ((value * c) - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
 };
 
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
 
-var BN = __webpack_require__(8);
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var BN = __webpack_require__(11);
 var stripHexPrefix = __webpack_require__(0);
 
 /**
@@ -2804,392 +2723,9 @@ module.exports = function numberToBN(arg) {
 }
 
 
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-var schema = __webpack_require__(4);
-var util = __webpack_require__(3);
-var numberToBN = __webpack_require__(5);
-var stripHexPrefix = __webpack_require__(0);
-var padToEven = util.padToEven;
-var arrayContainsArray = util.arrayContainsArray;
-var getBinarySize = util.getBinarySize;
-
-/**
- * Format quantity values, either encode to hex or decode to BigNumber
- * should intake null, stringNumber, number, BN
- *
- * @method formatQuantity
- * @param {String|BigNumber|Number} value quantity or tag to convert
- * @param {Boolean} encode to hex or decode to BigNumber
- * @returns {Optional} output to BigNumber or string
- * @throws error if value is a float
- */
-function formatQuantity(value, encode, pad) {
-  if (['string', 'number', 'object'].indexOf(typeof value) === -1 || value === null) {
-    return value;
-  }
-
-  var numberValue = numberToBN(value);
-  var numPadding = pad && numberValue.toString(16).length % 2 ? '0' : '';
-
-  if (numberToBN(value).isNeg()) {
-    throw new Error('[ethjs-format] while formatting quantity \'' + numberValue.toString(10) + '\', invalid negative number. Number must be positive or zero.');
-  }
-
-  return encode ? '0x' + numPadding + numberValue.toString(16) : numberValue;
-}
-
-/**
- * Format quantity or tag, if tag bypass return, else format quantity
- * should intake null, stringNumber, number, BN, string tag
- *
- * @method formatQuantityOrTag
- * @param {String|BigNumber|Number} value quantity or tag to convert
- * @param {Boolean} encode encode the number to hex or decode to BigNumber
- * @returns {Object|String} output to BigNumber or string
- * @throws error if value is a float
- */
-function formatQuantityOrTag(value, encode) {
-  var output = value; // eslint-disable-line
-
-  // if the value is a tag, bypass
-  if (schema.tags.indexOf(value) === -1) {
-    output = formatQuantity(value, encode);
-  }
-
-  return output;
-}
-
-/**
- * FormatData under strict conditions hex prefix
- *
- * @method formatData
- * @param {String} value the bytes data to be formatted
- * @param {Number} byteLength the required byte length (usually 20 or 32)
- * @returns {String} output output formatted data
- * @throws error if minimum length isnt met
- */
-function formatData(value, byteLength) {
-  var output = value; // eslint-disable-line
-  var outputByteLength = 0; // eslint-disable-line
-
-  // prefix only under strict conditions, else bypass
-  if (typeof value === 'string') {
-    output = '0x' + padToEven(stripHexPrefix(value));
-    outputByteLength = getBinarySize(output);
-  }
-
-  // format double padded zeros.
-  if (output === '0x00') {
-    output = '0x0';
-  }
-
-  // throw if bytelength is not correct
-  if (typeof byteLength === 'number' && value !== null && output !== '0x' && output !== '0x0' // support empty values
-  && (!/^[0-9A-Fa-f]+$/.test(stripHexPrefix(output)) || outputByteLength !== 2 + byteLength * 2)) {
-    throw new Error('[ethjs-format] hex string \'' + output + '\' must be an alphanumeric ' + (2 + byteLength * 2) + ' utf8 byte hex (chars: a-fA-F) string, is ' + outputByteLength + ' bytes');
-  }
-
-  return output;
-}
-
-/**
- * Format object, even with random RPC caviets
- *
- * @method formatObject
- * @param {String|Array} formatter the unit to convert to, default ether
- * @param {Object} value the object value
- * @param {Boolean} encode encode to hex or decode to BigNumber
- * @returns {Object} output object
- * @throws error if value is a float
- */
-function formatObject(formatter, value, encode) {
-  var output = Object.assign({}, value); // eslint-disable-line
-  var formatObject = null; // eslint-disable-line
-
-  // if the object is a string flag, then retreive the object
-  if (typeof formatter === 'string') {
-    if (formatter === 'Boolean|EthSyncing') {
-      formatObject = Object.assign({}, schema.objects.EthSyncing);
-    } else if (formatter === 'DATA|Transaction') {
-      formatObject = Object.assign({}, schema.objects.Transaction);
-    } else {
-      formatObject = Object.assign({}, schema.objects[formatter]);
-    }
-  }
-
-  // check if all required data keys are fulfilled
-  if (!arrayContainsArray(Object.keys(value), formatObject.__required)) {
-    // eslint-disable-line
-    throw new Error('[ethjs-format] object ' + JSON.stringify(value) + ' must contain properties: ' + formatObject.__required.join(', ')); // eslint-disable-line
-  }
-
-  // assume formatObject is an object, go through keys and format each
-  Object.keys(formatObject).forEach(function (valueKey) {
-    if (valueKey !== '__required' && typeof value[valueKey] !== 'undefined') {
-      output[valueKey] = format(formatObject[valueKey], value[valueKey], encode);
-    }
-  });
-
-  return output;
-}
-
-/**
- * Format array
- *
- * @method formatArray
- * @param {String|Array} formatter the unit to convert to, default ether
- * @param {Object} value the value in question
- * @param {Boolean} encode encode to hex or decode to BigNumber
- * @param {Number} lengthRequirement the required minimum array length
- * @returns {Object} output object
- * @throws error if minimum length isnt met
- */
-function formatArray(formatter, value, encode, lengthRequirement) {
-  var output = value.slice(); // eslint-disable-line
-  var formatObject = formatter; // eslint-disable-line
-
-  // if the formatter is an array or data, then make format object an array data
-  if (formatter === 'Array|DATA') {
-    formatObject = ['D'];
-  }
-
-  // if formatter is a FilterChange and acts like a BlockFilter
-  // or PendingTx change format object to tx hash array
-  if (formatter === 'FilterChange' && typeof value[0] === 'string') {
-    formatObject = ['D32'];
-  }
-
-  // enforce minimum value length requirements
-  if (encode === true && typeof lengthRequirement === 'number' && value.length < lengthRequirement) {
-    throw new Error('array ' + JSON.stringify(value) + ' must contain at least ' + lengthRequirement + ' params, but only contains ' + value.length + '.'); // eslint-disable-line
-  }
-
-  // make new array, avoid mutation
-  formatObject = formatObject.slice();
-
-  // assume formatObject is an object, go through keys and format each
-  value.forEach(function (valueKey, valueIndex) {
-    // use key zero as formatter for all values, unless otherwise specified
-    var formatObjectKey = 0; // eslint-disable-line
-
-    // if format array is exact, check each argument against formatter argument
-    if (formatObject.length > 1) {
-      formatObjectKey = valueIndex;
-    }
-
-    output[valueIndex] = format(formatObject[formatObjectKey], valueKey, encode);
-  });
-
-  return output;
-}
-
-/**
- * Format various kinds of data to RPC spec or into digestable JS objects
- *
- * @method format
- * @param {String|Array} formatter the data formatter
- * @param {String|Array|Object|Null|Number} value the data value input
- * @param {Boolean} encode encode to hex or decode to BigNumbers, Strings, Booleans, Null
- * @param {Number} lengthRequirement the minimum data length requirement
- * @throws error if minimum length isnt met
- */
-function format(formatter, value, encode, lengthRequirement) {
-  var output = value; // eslint-disable-line
-
-  // if formatter is quantity or quantity or tag
-  if (formatter === 'Q') {
-    output = formatQuantity(value, encode);
-  } else if (formatter === 'QP') {
-    output = formatQuantity(value, encode, true);
-  } else if (formatter === 'Q|T') {
-    output = formatQuantityOrTag(value, encode);
-  } else if (formatter === 'D') {
-    output = formatData(value); // dont format data flagged objects like compiler output
-  } else if (formatter === 'D20') {
-    output = formatData(value, 20); // dont format data flagged objects like compiler output
-  } else if (formatter === 'D32') {
-    output = formatData(value, 32); // dont format data flagged objects like compiler output
-  } else {
-    // if value is an object or array
-    if (typeof value === 'object' && value !== null && Array.isArray(value) === false) {
-      output = formatObject(formatter, value, encode);
-    } else if (Array.isArray(value)) {
-      output = formatArray(formatter, value, encode, lengthRequirement);
-    }
-  }
-
-  return output;
-}
-
-/**
- * Format RPC inputs generally to the node or TestRPC
- *
- * @method formatInputs
- * @param {Object} method the data formatter
- * @param {Array} inputs the data inputs
- * @returns {Array} output the formatted inputs array
- * @throws error if minimum length isnt met
- */
-function formatInputs(method, inputs) {
-  return format(schema.methods[method][0], inputs, true, schema.methods[method][2]);
-}
-
-/**
- * Format RPC outputs generally from the node or TestRPC
- *
- * @method formatOutputs
- * @param {Object} method the data formatter
- * @param {Array|String|Null|Boolean|Object} outputs the data inputs
- * @returns {Array|String|Null|Boolean|Object} output the formatted data
- */
-function formatOutputs(method, outputs) {
-  return format(schema.methods[method][1], outputs, false);
-}
-
-// export formatters
-module.exports = {
-  schema: schema,
-  formatQuantity: formatQuantity,
-  formatQuantityOrTag: formatQuantityOrTag,
-  formatObject: formatObject,
-  formatArray: formatArray,
-  format: format,
-  formatInputs: formatInputs,
-  formatOutputs: formatOutputs
-};
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-"use strict";
-'use strict'
-
-exports.byteLength = byteLength
-exports.toByteArray = toByteArray
-exports.fromByteArray = fromByteArray
-
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
-}
-
-// Support decoding URL-safe base64 strings, as Node.js does.
-// See: https://en.wikipedia.org/wiki/Base64#URL_applications
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
-
-function placeHoldersCount (b64) {
-  var len = b64.length
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
-  }
-
-  // the number of equal signs (place holders)
-  // if there are two placeholders, than the two characters before it
-  // represent one byte
-  // if there is only one, then the three characters before it represent 2 bytes
-  // this is just a cheap hack to not do indexOf twice
-  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
-}
-
-function byteLength (b64) {
-  // base64 is 4/3 + up to two characters of the original data
-  return (b64.length * 3 / 4) - placeHoldersCount(b64)
-}
-
-function toByteArray (b64) {
-  var i, l, tmp, placeHolders, arr
-  var len = b64.length
-  placeHolders = placeHoldersCount(b64)
-
-  arr = new Arr((len * 3 / 4) - placeHolders)
-
-  // if there are placeholders, only get up to the last complete 4 chars
-  l = placeHolders > 0 ? len - 4 : len
-
-  var L = 0
-
-  for (i = 0; i < l; i += 4) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
-    arr[L++] = (tmp >> 16) & 0xFF
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
-  }
-
-  if (placeHolders === 2) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[L++] = tmp & 0xFF
-  } else if (placeHolders === 1) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
-  }
-
-  return arr
-}
-
-function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
-}
-
-function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
-    tmp = ((uint8[i] << 16) & 0xFF0000) + ((uint8[i + 1] << 8) & 0xFF00) + (uint8[i + 2] & 0xFF)
-    output.push(tripletToBase64(tmp))
-  }
-  return output.join('')
-}
-
-function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var output = ''
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
-
-  // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
-  }
-
-  // pad the end with zeros, but make sure to not forget the extra bytes
-  if (extraBytes === 1) {
-    tmp = uint8[len - 1]
-    output += lookup[tmp >> 2]
-    output += lookup[(tmp << 4) & 0x3F]
-    output += '=='
-  } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
-    output += lookup[tmp >> 10]
-    output += lookup[(tmp >> 4) & 0x3F]
-    output += lookup[(tmp << 2) & 0x3F]
-    output += '='
-  }
-
-  parts.push(output)
-
-  return parts.join('')
-}
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function (module, exports) {
   'use strict';
@@ -6621,135 +6157,9 @@ function fromByteArray (uint8) {
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)(module)))
 
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = ((value * c) - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() { return this; })();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 module.exports = function(module) {
 	if(!module.webpackPolyfill) {
@@ -6759,22 +6169,23 @@ module.exports = function(module) {
 		if(!module.children) module.children = [];
 		Object.defineProperty(module, "loaded", {
 			enumerable: true,
-			configurable: false,
-			get: function() { return module.l; }
+			get: function() {
+				return module.l;
+			}
 		});
 		Object.defineProperty(module, "id", {
 			enumerable: true,
-			configurable: false,
-			get: function() { return module.i; }
+			get: function() {
+				return module.i;
+			}
 		});
 		module.webpackPolyfill = 1;
 	}
 	return module;
-}
+};
 
 
-/***/ }
-/******/ ])
+/***/ })
+/******/ ]);
 });
-;
 //# sourceMappingURL=ethjs-format.js.map
