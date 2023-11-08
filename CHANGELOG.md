@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0]
+### Uncategorized
+- deps: ethjs-util@0.1.3 -> @metamask/ethjs-util@^0.3.0
+- deps: number-to-bn@1.7.0 -> @metamask/number-to-bn@^1.7.1
+- deps: bn.js@4.11.6->^5.2.1
+
 ## [0.2.8]
 ### Changed
 - Rename package from `ethjs-format` to `@metamask/ethjs-format` ([#4](https://github.com/MetaMask/ethjs-format/pull/4))
@@ -117,7 +123,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - License
 
 
-[Unreleased]: https://github.com/MetaMask/ethjs-format/compare/v0.2.8...HEAD
+[Unreleased]: https://github.com/MetaMask/ethjs-format/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/MetaMask/ethjs-format/compare/v0.2.8...v0.3.0
 [0.2.8]: https://github.com/MetaMask/ethjs-format/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/MetaMask/ethjs-format/compare/v0.2.0...v0.2.7
 [0.2.0]: https://github.com/MetaMask/ethjs-format/compare/v0.1.8...v0.2.0
