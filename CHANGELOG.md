@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8]
+### Uncategorized
+- chore: remove bundleDependencies from package metadata
+- chore: change package bundleDependencies from false to []
+- format changelog
+- chore: add package publishConfig
+- chore: format repository url
+- devDeps: remove redundant ethjs-schema, ethjs-util
+- deprecate nodejs < v8.17, npm < v6 ([#8](https://github.com/MetaMask/ethjs-format/pull/8))
+- rename package from ethjs-format to @metamask/ethjs-format
+- chore: add .nvmrc set to v12
+- ci: Add GitHub Actions workflows
+- remove coveralls, travis-ci. npm test:coverage replaces test-travis/coveralls
+- npm dedupe; npm audit fix
+- devDeps: remove unused check-es3-syntax-cli
+- devDeps: remove unused eventsource-polyfill
+- devDeps: remove unused; add missing
+
 ## [0.2.7]
 ### Changed
 - forced support quantity padding
@@ -112,7 +130,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - License
 
 
-[Unreleased]: https://github.com/MetaMask/ethjs-format/compare/v0.2.7...HEAD
+[Unreleased]: https://github.com/MetaMask/ethjs-format/compare/v0.2.8...HEAD
+[0.2.8]: https://github.com/MetaMask/ethjs-format/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/MetaMask/ethjs-format/compare/v0.2.0...v0.2.7
 [0.2.0]: https://github.com/MetaMask/ethjs-format/compare/v0.1.8...v0.2.0
 [0.1.8]: https://github.com/MetaMask/ethjs-format/compare/v0.1.7...v0.1.8
