@@ -7,10 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.3.0]
-### Uncategorized
-- deps: ethjs-util@0.1.3 -> @metamask/ethjs-util@^0.3.0
-- deps: number-to-bn@1.7.0 -> @metamask/number-to-bn@^1.7.1
-- deps: bn.js@4.11.6->^5.2.1
+### Changed
+- Update from `ethjs-util@0.1.3` to `@metamask/ethjs-util@^0.3.0`
+- Update from `number-to-bn@1.7.0` to `@metamask/number-to-bn@^1.7.1`
+- Update `bn.js` from `4.11.6` to `^5.2.1`
 
 ## [0.2.8]
 ### Changed
