@@ -1,6 +1,6 @@
+const numberToBN = require('@metamask/number-to-bn');
 const schema = require('ethjs-schema');
 const { arrayContainsArray, getBinarySize, padToEven } = require('ethjs-util');
-const numberToBN = require('number-to-bn');
 const stripHexPrefix = require('strip-hex-prefix');
 
 /**
