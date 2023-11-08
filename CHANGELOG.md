@@ -7,22 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.2.8]
-### Uncategorized
-- chore: remove bundleDependencies from package metadata
-- chore: change package bundleDependencies from false to []
-- format changelog
-- chore: add package publishConfig
-- chore: format repository url
-- devDeps: remove redundant ethjs-schema, ethjs-util
-- deprecate nodejs < v8.17, npm < v6 ([#8](https://github.com/MetaMask/ethjs-format/pull/8))
-- rename package from ethjs-format to @metamask/ethjs-format
-- chore: add .nvmrc set to v12
-- ci: Add GitHub Actions workflows
-- remove coveralls, travis-ci. npm test:coverage replaces test-travis/coveralls
-- npm dedupe; npm audit fix
-- devDeps: remove unused check-es3-syntax-cli
-- devDeps: remove unused eventsource-polyfill
-- devDeps: remove unused; add missing
+### Changed
+- Rename package from `ethjs-format` to `@metamask/ethjs-format` ([#4](https://github.com/MetaMask/ethjs-format/pull/4))
+- Deprecate nodejs < v8.17, npm < v6 ([#8](https://github.com/MetaMask/ethjs-format/pull/8))
 
 ## [0.2.7]
 ### Changed
