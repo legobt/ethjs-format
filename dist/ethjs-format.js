@@ -1918,12 +1918,14 @@ module.exports = function isHexPrefixed(str) {
 
 
 var schema = __webpack_require__(4);
-var util = __webpack_require__(5);
+
+var _require = __webpack_require__(5),
+    arrayContainsArray = _require.arrayContainsArray,
+    getBinarySize = _require.getBinarySize,
+    padToEven = _require.padToEven;
+
 var numberToBN = __webpack_require__(10);
 var stripHexPrefix = __webpack_require__(0);
-var padToEven = util.padToEven;
-var arrayContainsArray = util.arrayContainsArray;
-var getBinarySize = util.getBinarySize;
 
 /**
  * Format quantity values, either encode to hex or decode to BigNumber
@@ -2121,13 +2123,12 @@ function format(formatter, value, encode, lengthRequirement) {
     output = formatData(value, 20); // dont format data flagged objects like compiler output
   } else if (formatter === 'D32') {
     output = formatData(value, 32); // dont format data flagged objects like compiler output
-  } else {
-    // if value is an object or array
-    if (typeof value === 'object' && value !== null && Array.isArray(value) === false) {
-      output = formatObject(formatter, value, encode);
-    } else if (Array.isArray(value)) {
-      output = formatArray(formatter, value, encode, lengthRequirement);
-    }
+  } else if (typeof value === 'object'
+  // if value is an object or array
+  && value !== null && Array.isArray(value) === false) {
+    output = formatObject(formatter, value, encode);
+  } else if (Array.isArray(value)) {
+    output = formatArray(formatter, value, encode, lengthRequirement);
   }
 
   return output;
