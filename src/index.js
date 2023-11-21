@@ -1,5 +1,5 @@
+const util = require('@metamask/ethjs-util');
 const schema = require('ethjs-schema');
-const util = require('ethjs-util');
 const numberToBN = require('number-to-bn');
 const stripHexPrefix = require('strip-hex-prefix');
 const padToEven = util.padToEven;
