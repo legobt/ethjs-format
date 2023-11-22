@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.2.9]
+### Changed
+- Update from `ethjs-util@0.1.3` to `@metamask/ethjs-util@^0.2.0` ([#11](https://github.com/MetaMask/ethjs-format/pull/11))
 
 ## [0.2.8]
 ### Changed
