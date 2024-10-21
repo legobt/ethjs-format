@@ -116,7 +116,7 @@
     "eslint-plugin-react": "^7.21.5",
     "istanbul": "0.4.5",
     "json-loader": "^0.5.7",
-    "lint-staged": "1.0.1",
+    "lint-staged": "^12.5.0",
     "mocha": "^8.4.0",
     "pre-commit": "^1.2.2",
     "rimraf": "^3.0.2",
