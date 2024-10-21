@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0]
+### Uncategorized
+- ci: use npm v7 for build
+- devDeps: lint-staged@1.0.1->^12.5.0
+- ci: ignore whitespace in diff check
+- devDeps: bump eslint plugins
+- devDeps: eslint@^5.4.0->^7.32.0
+- devDeps: chai@^4.3.10->^4.5.0
+- devDeps: mocha@^7.1.2->^8.4.0
+- devDeps: cross-env@^6.0.3->^7.0.3
+- chore: npm >= 7
+- BREAKING: increase minimum node version to 10.19
+- chore: sync CHANGELOG.md with 0.2.9 backport
+- 0.3.0 ([#10](https://github.com/MetaMask/ethjs-format/pull/10))
+- deps: ethjs-util@0.1.3 -> @metamask/ethjs-util@^0.3.0
+- deps: number-to-bn@1.7.0 -> @metamask/number-to-bn@^1.7.1
+- deps: bn.js@4.11.6->^5.2.1
+- bump devDependencies ([#6](https://github.com/MetaMask/ethjs-format/pull/6))
+
 ## [0.3.0]
 ### Changed
 - Update from `ethjs-util@0.1.3` to `@metamask/ethjs-util@^0.3.0`
@@ -127,7 +146,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - License
 
 
-[Unreleased]: https://github.com/MetaMask/ethjs-format/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/MetaMask/ethjs-format/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/MetaMask/ethjs-format/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/MetaMask/ethjs-format/compare/v0.2.9...v0.3.0
 [0.2.9]: https://github.com/MetaMask/ethjs-format/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/MetaMask/ethjs-format/compare/v0.2.7...v0.2.8
