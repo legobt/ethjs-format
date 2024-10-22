@@ -7,23 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.4.0]
-### Uncategorized
-- ci: use npm v7 for build
-- devDeps: lint-staged@1.0.1->^12.5.0
-- ci: ignore whitespace in diff check
-- devDeps: bump eslint plugins
-- devDeps: eslint@^5.4.0->^7.32.0
-- devDeps: chai@^4.3.10->^4.5.0
-- devDeps: mocha@^7.1.2->^8.4.0
-- devDeps: cross-env@^6.0.3->^7.0.3
-- chore: npm >= 7
-- BREAKING: increase minimum node version to 10.19
-- chore: sync CHANGELOG.md with 0.2.9 backport
-- 0.3.0 ([#10](https://github.com/MetaMask/ethjs-format/pull/10))
-- deps: ethjs-util@0.1.3 -> @metamask/ethjs-util@^0.3.0
-- deps: number-to-bn@1.7.0 -> @metamask/number-to-bn@^1.7.1
-- deps: bn.js@4.11.6->^5.2.1
-- bump devDependencies ([#6](https://github.com/MetaMask/ethjs-format/pull/6))
+### Changed
+- **BREAKING**: Increase minimum node version to v10 ([#16](https://github.com/MetaMask/ethjs-format/pull/16))
 
 ## [0.3.0]
 ### Changed
